@@ -44,7 +44,7 @@ export default function Organizadiotn() {
       onCompleted: orgRefetch,
     })
 
-    router.push('/')
+    router.back()
   }
 
   if (loading) return 'Loading...'
