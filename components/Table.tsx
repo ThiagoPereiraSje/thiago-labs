@@ -3,6 +3,7 @@ import { AiFillDelete, AiFillEdit } from 'react-icons/ai'
 import { useMutation, useQuery } from '@apollo/client'
 import { DELETE_ORGANIZATION } from '../graphql/mutations'
 import { GET_ORGANIZATIONS } from '../graphql/queries'
+import { useSession } from 'next-auth/react'
 
 type TableData = {
   id: string
@@ -19,6 +20,7 @@ export type TableProps = {
 export default function Table({ data }: TableProps) {
   const [deleteOrganization] = useMutation(DELETE_ORGANIZATION)
   const { refetch: orgRefetch } = useQuery(GET_ORGANIZATIONS)
+  const { data: session } = useSession()
 
   const handleDelete = (id: string) => {
     deleteOrganization({ variables: { id: id }, onCompleted: orgRefetch })
@@ -50,19 +52,23 @@ export default function Table({ data }: TableProps) {
                 <td>{org.cnpj}</td>
                 <td>{org.collaborator_id.length}</td>
                 <td>
-                  <AiFillDelete
-                    size={20}
-                    color="red"
-                    className="cursor-pointer"
-                    onClick={() => handleDelete(org.id)}
-                  />
+                  {session?.roles.includes('creator') && (
+                    <AiFillDelete
+                      size={20}
+                      color="red"
+                      className="cursor-pointer"
+                      onClick={() => handleDelete(org.id)}
+                    />
+                  )}
                 </td>
                 <td>
-                  <Link href={`/organization/${org.id}`}>
-                    <a>
-                      <AiFillEdit size={20} />
-                    </a>
-                  </Link>
+                  {session?.roles.includes('creator') && (
+                    <Link href={`/organization/${org.id}`}>
+                      <a>
+                        <AiFillEdit size={20} />
+                      </a>
+                    </Link>
+                  )}
                 </td>
               </tr>
             )
